@@ -1,0 +1,684 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAVA GLASS | Customer Portal</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+    --navy:#071B33;
+    --blue:#1264B3;
+    --cyan:#32B7E8;
+    --bg:#F2F6FB;
+    --white:#FFFFFF;
+    --text:#14243A;
+    --muted:#718096;
+    --border:#DCE5EF;
+}
+
+* {
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body {
+    font-family:Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+}
+
+/* HEADER */
+
+header {
+    background:linear-gradient(120deg,#06172C,#104B82);
+    color:white;
+    padding:20px 6%;
+}
+
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    max-width:1200px;
+    margin:auto;
+}
+
+.logo {
+    font-size:25px;
+    font-weight:900;
+    letter-spacing:2px;
+}
+
+.logo span {
+    color:var(--cyan);
+}
+
+.navbar small {
+    color:#D6E9FA;
+}
+
+/* HERO */
+
+.hero {
+    max-width:1200px;
+    margin:auto;
+    padding:75px 6% 85px;
+    color:white;
+}
+
+.hero h1 {
+    font-size:clamp(32px,5vw,55px);
+    max-width:700px;
+    line-height:1.12;
+    margin-bottom:20px;
+}
+
+.hero p {
+    max-width:650px;
+    color:#D4E6F8;
+    line-height:1.8;
+    font-size:16px;
+}
+
+.hero button {
+    margin-top:28px;
+    background:var(--cyan);
+    color:#071B33;
+}
+
+/* MAIN */
+
+main {
+    max-width:1050px;
+    margin:35px auto;
+    padding:0 18px 50px;
+}
+
+.section {
+    background:white;
+    padding:28px;
+    border:1px solid var(--border);
+    border-radius:15px;
+    margin-bottom:22px;
+    box-shadow:0 8px 25px rgba(0,0,0,.035);
+}
+
+.section h2 {
+    font-size:20px;
+    color:var(--navy);
+    margin-bottom:22px;
+}
+
+.section h2 span {
+    color:var(--blue);
+    margin-right:8px;
+}
+
+.grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.field {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.full {
+    grid-column:1/-1;
+}
+
+label {
+    font-size:13px;
+    font-weight:bold;
+    color:#34465D;
+}
+
+input,select,textarea {
+    width:100%;
+    padding:13px;
+    border:1px solid #CAD6E3;
+    border-radius:8px;
+    font-size:14px;
+    background:white;
+    outline:none;
+}
+
+input:focus,select:focus,textarea:focus {
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px #1264b320;
+}
+
+textarea {
+    min-height:110px;
+    resize:vertical;
+}
+
+/* UPLOAD */
+
+.upload-box {
+    border:2px dashed #9AB6D0;
+    border-radius:12px;
+    padding:25px;
+    background:#F7FAFE;
+    text-align:center;
+}
+
+.upload-box input {
+    border:none;
+}
+
+.upload-box p {
+    font-size:12px;
+    color:var(--muted);
+    margin-top:10px;
+}
+
+.file-name {
+    font-size:13px;
+    color:var(--blue);
+    margin-top:12px;
+    overflow-wrap:anywhere;
+}
+
+/* BUTTONS */
+
+button {
+    border:none;
+    background:var(--blue);
+    color:white;
+    padding:14px 23px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover {
+    opacity:.9;
+}
+
+button:disabled {
+    opacity:.5;
+    cursor:wait;
+}
+
+.submit-area {
+    display:flex;
+    align-items:center;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+#message {
+    font-size:14px;
+    line-height:1.6;
+}
+
+.success {
+    color:#07834B;
+}
+
+.error {
+    color:#C1272D;
+}
+
+/* FOOTER */
+
+footer {
+    background:var(--navy);
+    padding:30px 15px;
+    color:#B8C9DC;
+    text-align:center;
+    font-size:13px;
+}
+
+@media(max-width:650px) {
+    .grid {
+        grid-template-columns:1fr;
+    }
+
+    .full {
+        grid-column:auto;
+    }
+
+    .section {
+        padding:20px;
+    }
+
+    .hero {
+        padding-top:55px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="navbar">
+        <div class="logo">
+            JAVA <span>GLASS</span>
+        </div>
+
+        <small>Customer Portal</small>
+    </div>
+
+    <div class="hero">
+        <h1>Your Glass Project Starts Here.</h1>
+
+        <p>
+            Welcome to JAVA GLASS.
+            Submit your glass requirements,
+            measurements and technical drawings.
+            Our team will review your order
+            and contact you.
+        </p>
+
+        <button onclick="document.getElementById('orderForm').scrollIntoView({behavior:'smooth'})">
+            PLACE YOUR ORDER
+        </button>
+    </div>
+</header>
+
+<main>
+
+<form id="orderForm">
+
+<!-- CUSTOMER INFORMATION -->
+
+<section class="section">
+
+<h2><span>01.</span> Customer Information</h2>
+
+<div class="grid">
+
+<div class="field">
+<label>Full Name *</label>
+<input id="name" required maxlength="120"
+placeholder="Enter your full name">
+</div>
+
+<div class="field">
+<label>Phone Number *</label>
+<input id="phone" required maxlength="30"
+placeholder="+255...">
+</div>
+
+<div class="field">
+<label>Email Address</label>
+<input id="email" type="email"
+placeholder="example@gmail.com">
+</div>
+
+<div class="field">
+<label>Project Location *</label>
+<input id="location" required
+placeholder="Dar es Salaam, Tanzania">
+</div>
+
+</div>
+</section>
+
+<!-- GLASS DETAILS -->
+
+<section class="section">
+
+<h2><span>02.</span> Glass Requirements</h2>
+
+<div class="grid">
+
+<div class="field">
+<label>Glass Category *</label>
+
+<select id="glass" required>
+<option value="">Select Glass</option>
+<option>Float Glass</option>
+<option>Tempered Glass</option>
+<option>Laminated Glass</option>
+<option>Insulated Glass</option>
+<option>One Way Glass</option>
+<option>Mirror</option>
+<option>Other</option>
+</select>
+</div>
+
+<div class="field">
+<label>Required Service *</label>
+
+<select id="service" required>
+<option value="">Select Service</option>
+<option>Glass Supply</option>
+<option>Glass Cutting</option>
+<option>Tempering</option>
+<option>Drilling / Holes</option>
+<option>Edge Polishing</option>
+<option>Installation</option>
+<option>Supply & Installation</option>
+<option>Other Processing</option>
+</select>
+</div>
+
+<div class="field">
+<label>Width (mm)</label>
+<input id="width" type="number"
+min="0" step="0.1" placeholder="1200">
+</div>
+
+<div class="field">
+<label>Height (mm)</label>
+<input id="height" type="number"
+min="0" step="0.1" placeholder="2100">
+</div>
+
+<div class="field">
+<label>Glass Thickness</label>
+
+<select id="thickness">
+<option value="">Select Thickness</option>
+<option>3mm</option>
+<option>4mm</option>
+<option>5mm</option>
+<option>6mm</option>
+<option>8mm</option>
+<option>10mm</option>
+<option>12mm</option>
+<option>Other</option>
+</select>
+</div>
+
+<div class="field">
+<label>Quantity *</label>
+<input id="quantity" type="number"
+min="1" max="10000" value="1" required>
+</div>
+
+<div class="field full">
+<label>Additional Requirements</label>
+
+<textarea id="details"
+placeholder="Describe glass specifications, holes, cut-outs, colours, accessories, installation requirements and other instructions..."></textarea>
+</div>
+
+</div>
+</section>
+
+<!-- DRAWINGS -->
+
+<section class="section">
+
+<h2><span>03.</span> Upload Glass Drawing</h2>
+
+<div class="upload-box">
+
+<label for="drawing">
+Upload Your Technical Drawing
+</label>
+
+<input
+id="drawing"
+type="file"
+accept=".pdf,.png,.jpg,.jpeg,.dwg,.dxf"
+>
+
+<p>
+Supported formats: PDF, PNG, JPG, JPEG, DWG, DXF.
+Maximum size: 15MB.
+</p>
+
+<div class="file-name" id="fileName">
+No file selected.
+</div>
+
+</div>
+
+</section>
+
+<!-- SUBMIT -->
+
+<section class="section">
+
+<h2><span>04.</span> Submit Your Order</h2>
+
+<p style="color:#718096;font-size:13px;line-height:1.8;margin-bottom:20px">
+Please review your information before submitting.
+Our team will receive your order and contact you.
+</p>
+
+<div class="submit-area">
+
+<button id="submitBtn" type="submit">
+SUBMIT ORDER
+</button>
+
+<span id="message"></span>
+
+</div>
+
+</section>
+
+</form>
+
+</main>
+
+<footer>
+© <span id="year"></span> JAVA GLASS LIMITED.
+<br><br>
+PURE GLASS SOLUTIONS
+</footer>
+
+<script>
+
+// ====================================
+// SUPABASE CONFIGURATION
+// ====================================
+
+const SUPABASE_URL = "https://ktebpqezyqcdufbslzyu.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_FTXkFZHIajbhIY7NaGidDg_zMsxdIny";
+
+const BUCKET = "glass-drawings";
+
+const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+// ====================================
+// GENERAL SETTINGS
+// ====================================
+
+const $ = id => document.getElementById(id);
+
+$("year").textContent = new Date().getFullYear();
+
+$("drawing").addEventListener("change", function() {
+
+    const file = this.files[0];
+
+    $("fileName").textContent =
+        file ? file.name : "No file selected.";
+
+});
+
+// ====================================
+// SUBMIT CUSTOMER ORDER
+// ====================================
+
+$("orderForm").addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    const btn = $("submitBtn");
+    const msg = $("message");
+    const file = $("drawing").files[0];
+
+    msg.className = "";
+    msg.textContent = "";
+
+    if (SUPABASE_KEY.includes("PASTE_YOUR")) {
+        msg.className = "error";
+        msg.textContent = "Please configure your Supabase key first.";
+        return;
+    }
+
+    if (file && file.size > 15 * 1024 * 1024) {
+        msg.className = "error";
+        msg.textContent = "File exceeds the 15MB limit.";
+        return;
+    }
+
+    const allowed = [
+        "pdf","png","jpg","jpeg","dwg","dxf"
+    ];
+
+    if (file && !allowed.includes(
+        file.name.split(".").pop().toLowerCase()
+    )) {
+        msg.className = "error";
+        msg.textContent = "Unsupported file format.";
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "SUBMITTING...";
+
+    try {
+
+        const orderId = crypto.randomUUID();
+
+        let drawingPath = null;
+
+        // UPLOAD DRAWING
+
+        if (file) {
+
+            const safeName = file.name.replace(
+                /[^a-zA-Z0-9._-]/g, "_"
+            ).slice(0,100);
+
+            drawingPath =
+                orderId + "/" +
+                Date.now() + "_" + safeName;
+
+            const { error: uploadError } =
+                await db.storage
+                .from(BUCKET)
+                .upload(drawingPath, file);
+
+            if (uploadError) {
+                throw uploadError;
+            }
+
+        }
+
+        // ORDER INFORMATION
+
+        const order = {
+
+            id: orderId,
+
+            customer_name:
+                $("name").value.trim(),
+
+            phone:
+                $("phone").value.trim(),
+
+            email:
+                $("email").value.trim() || null,
+
+            project_location:
+                $("location").value.trim(),
+
+            glass_type:
+                $("glass").value,
+
+            service:
+                $("service").value,
+
+            width_mm:
+                $("width").value
+                ? Number($("width").value)
+                : null,
+
+            height_mm:
+                $("height").value
+                ? Number($("height").value)
+                : null,
+
+            thickness:
+                $("thickness").value || null,
+
+            quantity:
+                Number($("quantity").value),
+
+            details:
+                $("details").value.trim() || null,
+
+            drawing_path:
+                drawingPath,
+
+            status:
+                "Pending"
+
+        };
+
+        // SAVE TO DATABASE
+
+        const { data, error } = await db
+            .from("glass_orders")
+            .insert(order)
+            .select("order_number")
+            .single();
+
+        if (error) {
+            throw error;
+        }
+
+        // SUCCESS MESSAGE
+
+        msg.className = "success";
+
+        msg.textContent =
+            "Your order was submitted successfully! " +
+            "Reference: " + data.order_number +
+            ". Please keep this reference number.";
+
+        $("orderForm").reset();
+
+        $("fileName").textContent =
+            "No file selected.";
+
+    }
+
+    catch(error) {
+
+        console.error(error);
+
+        msg.className = "error";
+
+        msg.textContent =
+            "Submission failed: " + error.message;
+
+    }
+
+    finally {
+
+        btn.disabled = false;
+        btn.textContent = "SUBMIT ORDER";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
